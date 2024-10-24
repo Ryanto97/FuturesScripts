@@ -18,6 +18,7 @@ var tab=globalFormContext.ui.tabs.get("General");
 var devsection = tab.sections.get("Development_Section1");
 var bugsection = tab.sections.get("Bugfix_section2");
 var datasection = tab.sections.get("Data_Section6");
+var configuration = tab.section.get("Configuration_section_8");
 
 //only show sections
 var generalInfoSection = tab.sections.get("GeneralInfo_section_7");
@@ -25,9 +26,10 @@ var issueSection = tab.sections.get("issue_section_9");
 var statusSection = tab.sections.get("Status_section_8");
 
 // Hide a section
-devsection.setVisible(false); 
-bugsection.setVisible(false); 
-datasection.setVisible(false); 
+//devsection.setVisible(false); 
+//bugsection.setVisible(false); 
+//datasection.setVisible(false); 
+//configuration.setVisible(false);
 
 
 // Show a section
