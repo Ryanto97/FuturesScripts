@@ -10,7 +10,7 @@ function AlertIfMedicalIsYes(formcontext) {
 
 	var isMedical = formcontext.getAttribute("fhg_medicalneed").getValue();
 	var medicalNeed =  formcontext.getAttribute("fhg_medicalneed").getText();
-	var message = "There is a medical need on the account: " + medicalNeed + " please see Communication Preferences and Medical Needs"; 
+	var message = "There is a medical need on the account: " + medicalNeed + ". Please see Communication Preferences and Medical Needs"; 
 	
 
 	if (isMedical) { 
@@ -25,7 +25,7 @@ function AlertIfMedicalIsYes(formcontext) {
 function deceasedCustomer(formcontext) { 
 
 	var deceasedCustomer = formcontext.getAttribute("fhg_datedeceased").getValue();
-	var message = "NOTE: This Customer is Deceased"; 
+	var message = "NOTE: Customer is Deceased"; 
 	
 
 	if (deceasedCustomer === null ) { 
@@ -40,4 +40,4 @@ function deceasedCustomer(formcontext) {
 }
 
 
-//This is a code test
+

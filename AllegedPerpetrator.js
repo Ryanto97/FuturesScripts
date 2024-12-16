@@ -6,6 +6,10 @@ function getFormcontext(executionContext) {
     console.log("Form Context: "); // Xrm.Page() for debugtab
 
     ShowhidePerpAddress();
+    
+    
+    //Add onchange event to show POC field 
+    globalFormContext.getAttribute("fhg_allegedperpetrator").addOnChange(ShowhidePerpAddress);
 
 }
 
@@ -13,16 +17,14 @@ function getFormcontext(executionContext) {
 
 function ShowhidePerpAddress() {
 
-    var incidentGUID = globalFormContext.data.entity.getId(); ;
+    var incidentGUID = globalFormContext.data.entity.getId();
 
 
     if (incidentGUID !== null && incidentGUID.length > 0) {
         // Extract the GUID of the selected Contact (string format)
         incidentGUID = incidentGUID.replace('{', '').replace('}', '').toLowerCase();
-    }
-
-
-    Xrm.WebApi.retrieveRecord("incident", incidentGUID , "?$select=_fhg_allegedperpetrator_value&$expand=fhg_AllegedPerpetrator($select=address1_composite)").then(
+        
+        Xrm.WebApi.retrieveRecord("incident", incidentGUID , "?$select=_fhg_allegedperpetrator_value&$expand=fhg_AllegedPerpetrator($select=address1_composite)").then(
         function success(result) {
             console.log(result);
             // Columns
@@ -35,7 +37,8 @@ function ShowhidePerpAddress() {
             if (result.hasOwnProperty("fhg_AllegedPerpetrator") && result["fhg_AllegedPerpetrator"] !== null) {
                 var fhg_AllegedPerpetrator_address1_composite = result["fhg_AllegedPerpetrator"]["address1_composite"]; // Multiline Text
 
-                formContext.getAttribute("fhg_alledgeperpetratoraddress").setValue(fhg_AllegedPerpetrator_address1_composite)
+                globalFormContext.getAttribute("fhg_alledgeperpetratoraddress").setValue(fhg_AllegedPerpetrator_address1_composite);
+                globalFormContext.data.save();
             }
 
 
@@ -44,6 +47,11 @@ function ShowhidePerpAddress() {
             console.log(error.message);
         }
     );
+
+        
+    }
+
+
 
 
 }

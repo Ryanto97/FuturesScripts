@@ -18,7 +18,7 @@ function showAreafield() {
     
     //Display Area On change when subject contains data 
     formContext.getControl("fhg_area").setVisible(true);
-    formContext.getAttribute("fhg_area").setRequiredLevel("requried");
+   // formContext.getAttribute("fhg_area").setRequiredLevel("requried");
 
 }
 
