@@ -1,28 +1,46 @@
-function setcontext_onload(executionContext) {
-	var formcontext = executionContext.getFormContext();
+var formcontext;
 
-	AlertIfMedicalIsYes(formcontext);
-       deceasedCustomer(formcontext);
+function setcontext_onload(executionContext) {
+	formcontext = executionContext.getFormContext();
+
+	AlertIfMedicalIsYes();
+       deceasedCustomer();
+
+	    //Add onchange event to show banner if medical field 
+		formcontext.getAttribute("fhg_medicalneed").addOnChange(AlertIfMedicalIsYes);
+
 }
 
 
-function AlertIfMedicalIsYes(formcontext) { 
+function AlertIfMedicalIsYes() { 
+
+	
 
 	var isMedical = formcontext.getAttribute("fhg_medicalneed").getValue();
 	var medicalNeed =  formcontext.getAttribute("fhg_medicalneed").getText();
-	var message = "There is a medical need on the account: " + medicalNeed + " please see Communication Preferences and Medical Needs"; 
+	var message = "There is a medical need on the account: " + medicalNeed + ". Please see Communication Preferences and Medical Needs"; 
 	
 
-	if (isMedical !== 100000006 &&(isMedical !== null)) { //no medical need//not null 
-	//pop up alert
-	alert("WARNING: This Contact has a medical on it");
-	//banner
-	formcontext.ui.setFormNotification(message, "WARNING",null);
+	if (isMedical !== null) {  // not eq null
+
+		if(isMedical[0] !== 100000006){// No medical Need
+
+			//pop up alert
+			alert("WARNING: This Contact has a medical on it");
+			//banner
+			formcontext.ui.setFormNotification(message, "WARNING","medicalid");
+
+		}
+	} else if (isMedical == null) {
+
+		formcontext.ui.clearFormNotification("medicalid")
+
+
 	}
 }
 
 
-function deceasedCustomer(formcontext) { 
+function deceasedCustomer() { 
 
 	var deceasedCustomer = formcontext.getAttribute("fhg_datedeceased").getValue();
 	var message = "NOTE: Customer Is deceased"; 
@@ -38,6 +56,3 @@ function deceasedCustomer(formcontext) {
         
     }
 }
-
-
-
