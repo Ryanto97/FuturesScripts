@@ -1,0 +1,50 @@
+if (typeof (Blacklight) === "undefined") {
+    Blacklight = function () { };
+}
+
+Blacklight.Survivorship = function () {
+
+    var init = function () {
+        Blacklight.SetLable(BlacklightCase.Fields.Common.Customer, "Reported By");
+      
+        Blacklight.SetVisibleAndMandatory(BlacklightCase.Fields.Survivorship.NameOfDeceased, true, true);
+        Blacklight.SetVisibleAndMandatory(BlacklightCase.Fields.Survivorship.DateDeceased, true, true);
+        Blacklight.SetVisibleAndMandatory(BlacklightCase.Fields.Survivorship.Area, true, true); // Add area 02/04/2025 rt
+        Blacklight.FormContext.getAttribute(BlacklightCase.Fields.Survivorship.NameOfDeceased).addOnChange(Blacklight.OnNameOfDeceasedChanged);
+    };
+
+    Blacklight.OnNameOfDeceasedChanged = function () {
+
+        var customerId = Blacklight.GetValueLookupID(BlacklightCase.Fields.Survivorship.NameOfDeceased);
+        if (customerId) {
+            Blacklight.Common.GetTenancyPropertyOccupancy(customerId, occupancySearchCompleted);
+        }
+    }
+
+    function occupancySearchCompleted(results) {
+        if (results) {
+            debugger;
+            if (results.HasOccupancy)
+                Blacklight.SetLookupValue(BlacklightCase.Fields.Tenancy.fhg_occupancy, results.OccupancyID, results.OccupancyName, BlacklightCase.TableNames.fhg_occupancy);
+            else
+                Blacklight.ClearFieldValue(BlacklightCase.Fields.Tenancy.fhg_occupancy);
+
+            if (results.HasTenancy)
+                Blacklight.SetLookupValue(BlacklightCase.Fields.Tenancy.fhg_tenancy, results.TenancyID, results.TenancyName, BlacklightCase.TableNames.fhg_tenancy);
+            else
+                Blacklight.ClearFieldValue(BlacklightCase.Fields.Tenancy.fhg_tenancy);
+
+            if (results.HasProperty)
+                Blacklight.SetLookupValue(BlacklightCase.Fields.Tenancy.fhg_property, results.PropertyID, results.PropertyName, BlacklightCase.TableNames.fhg_property);
+            else
+                Blacklight.ClearFieldValue(BlacklightCase.Fields.Tenancy.fhg_property);
+
+
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_tenancy, results.HasTenancy);
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_property, results.HasProperty);
+        }
+    }
+    return {
+        Init: init
+    };
+}();

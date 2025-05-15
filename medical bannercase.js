@@ -1,6 +1,8 @@
-function setMedicalNeed_onload() {
-    var formContext = Xrm.Page;
-    var contactId = formContext.getAttribute("customerid").getValue();
+var formcontext;
+
+function setMedicalNeed_onload(executionContext) {
+    formcontext = executionContext.getFormContext();
+    var contactId = formcontext.getAttribute("customerid").getValue();
     var contactGUID = null;
 
  
@@ -21,10 +23,8 @@ function setMedicalNeed_onload() {
                     var medNeed = contactRecord["fhg_medicalneed@OData.Community.Display.V1.FormattedValue"];
                     if (medNeed) {
                         var message = "There is a medical need on the account: " + medNeed + ", please see Communication Preferences and Medical Needs";
-                        // Pop-up alert
-                        alert("WARNING: This Contact has a medical on it");
                         // Banner notification
-                        formContext.ui.setFormNotification(message, "WARNING", null);
+                     formcontext.ui.setFormNotification(message, "WARNING", null);
                     }
                 }
             },
@@ -38,3 +38,11 @@ function setMedicalNeed_onload() {
 
     
 
+function medicalNeed_OnChange(executionContext) {
+    formcontext = executionContext.getFormContext();
+
+    //Add onchange event  
+    formContext.getAttribute("").addOnChange(setMedicalNeed_onload);
+
+
+}
