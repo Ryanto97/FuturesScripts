@@ -42,7 +42,7 @@ function medicalNeed_OnChange(executionContext) {
     formcontext = executionContext.getFormContext();
 
     //Add onchange event  
-    formContext.getAttribute("").addOnChange(setMedicalNeed_onload);
+    formcontext.getAttribute("customerid").addOnChange(setMedicalNeed_onload);
 
 
 }

@@ -1,4 +1,4 @@
-if (typeof (BlacklightCase) === "undefined") {
+﻿if (typeof (BlacklightCase) === "undefined") {
     BlacklightCase = function () { };
 }
 
@@ -69,7 +69,6 @@ BlacklightCase.Sections =
 };
 
 
-
 BlacklightCase.Fields =
 {
     Common:
@@ -82,9 +81,7 @@ BlacklightCase.Fields =
         Status: "statecode",
         StatusReason: "statuscode",
         Description: "description",
-        TimeOnCase: "fhg_timespentoncase",
-        
-       
+        TimeOnCase: "fhg_timespentoncase"
     },
     Mapped:
     {
@@ -102,7 +99,6 @@ BlacklightCase.Fields =
         unauthorisedoccupier: "fhg_unauthorisedoccupier",
         multiagencysupportwho: "fhg_multiagencysupportwho",
         safeguardingwho: "fhg_safeguardingwho",
-        
     },
     Resolution:
     {
@@ -187,7 +183,7 @@ BlacklightCase.Fields =
         DamgeCauseBy: "fhg_damagecausedby",
         TypeOfDamage: "fhg_typeofdamage",
         UpdateBySms: "fhg_updatebysms",
-      
+
     },
     ReportingData: {
         fhg_stage1daystoacknowledge: "fhg_stage1daystoacknowledge",
@@ -204,6 +200,7 @@ BlacklightCase.Fields =
         fhg_stage1closuresubreason: "fhg_stage1closuresubreason",
         fhg_stage1closuredate: "fhg_stage1closuredate",
         fhg_stage1daystoclose: "fhg_stage1daystoclose",
+        fhg_stage2formalacknowledgementsent: "fhg_stage2formalacknowledgementsent",
         fhg_stage2daystoacknowledge: "fhg_stage2daystoacknowledge",
         fhg_stage2customerhappytoclose: "fhg_stage2customerhappytoclose",
         fhg_stage2customernothappytoclosereason: "fhg_stage2customernothappytoclosereason",
@@ -226,8 +223,7 @@ BlacklightCase.Fields =
     EstateInspection:
     {
         EstateInspectionArea: "fhg_estateinspectionarea",
-        Area: "fhg_area",
-        CategoryOther:"fhg_categoryother"
+        Area: "fhg_area"
     },
     AdditionalFields:
     {
@@ -254,6 +250,7 @@ BlacklightCase.Fields =
         fhg_alteration: "fhg_alteration",
         fhg_alterationgroup: "fhg_alterationgroup",
         fhg_onbehalfofcustomer: "fhg_onbehalfofcustomer",
+        
     },
     Tenancy:
     {
@@ -335,12 +332,13 @@ BlacklightCase.Fields =
     },
     NoAccess: {
         Category: "fhg_noaccesscategory",
-        AnniversaryDate:"fhg_anniversarydate",
+        AnniversaryDate: "fhg_anniversarydate",
         Area: "fhg_area"
     },
     Other: {
-        CategoryOther:"fhg_categoryother",
-        Area: "fhg_area"
+        Area: "fhg_area",
+        CategoryOther: "fhg_categoryother"
+
     },
     Abandoned: {
         AbandonedCategory: "fhg_abandonedcategory",
@@ -369,7 +367,8 @@ BlacklightCase.Fields =
         Area: "fhg_area"
     },
     PermissionRequestTenancy: {
-        PermissionRequestTenancyCategory: "fhg_permissionrequesttenancycategory"
+        PermissionRequestTenancyCategory: "fhg_permissionrequesttenancycategory",
+        Area: "fhg_area"
     },
     CustomerNameChange: {
 
@@ -470,7 +469,7 @@ BlacklightCase.Fields =
         Block: "fhg_block",
         ReportedOnDate: "fhg_reportedondate",
         PropertyBlock: "fhg_propertyblock",
-        Area: "fhg_area" 
+        Area: "fhg_area"
     },
     CustomerRisk:
     {
@@ -509,6 +508,14 @@ BlacklightCase.Fields =
         AllegedPerpetrator: "fhg_allegedperpetrator",
         LockSupportedHousingCase: "fhg_locksupportedhousingcase",
         LockedSupportedHousingCase: "fhg_lockedsupportedhousingcase"
+    },
+    BeepAssist: {
+        Category: "fhg_category",
+        SubCategory: "fhg_subcategory",
+        AssignToTeam: "fhg_assigntoteam",
+        RepairsTrade: "fhg_repairstrade",
+        OnBehalfOf: "fhg_onbehalfofcustomer",
+        Area:"fhg_area"
     }
 };
 
@@ -561,11 +568,12 @@ BlacklightCase.NoAccessClosureReason = {
 
 BlacklightCase.subjects = {
     General: "4b2bcd0b-2f16-ec11-b6e6-002248412841",
+    BeepAssist: "9b1aa1b0-0a37-f011-8c4d-0022483ec9ba",
     HomeSurvey: "24689177-2f16-ec11-b6e6-002248412841",
     Complaint: "d3711032-2f16-ec11-b6e6-002248412841",
     ComplaintNew: "1dc5dc33-50a3-ef11-8a69-7c1e5202b170",
     PermissionRequest: "bedb897d-2f16-ec11-b6e6-002248412841",
-    Neighbourhoods:{
+    Neighbourhoods: {
         EstateInspection: "bee76b71-2f16-ec11-b6e6-002248412841",
         EstateManagement: "c19b4365-2f16-ec11-b6e6-002248412841",
         ASB: "e6e69457-2f16-ec11-b6e6-002248412841",
@@ -585,7 +593,7 @@ BlacklightCase.subjects = {
             JointToSole: "ae11a344-5bba-ec11-983f-6045bd0ff653",
             Assignment: "f31cc8da-34bb-ec11-983f-6045bd0ff653",
             Overcrowding: "1f207f74-8fc0-ec11-983e-002248438e67",
-            UseAndOccupation : "7bf4c17f-27c2-ec11-983e-6045bd0f7bab",
+            UseAndOccupation: "7bf4c17f-27c2-ec11-983e-6045bd0f7bab",
             DirectLet: "0b8414d6-80c4-ec11-a7b5-6045bd0fa694",
             MultiAgencySupport: "40b74f71-87c4-ec11-a7b5-6045bd0fa760",
             Hoarding: "8ac8ebe8-5ccc-ec11-a7b6-6045bd110cb9",
