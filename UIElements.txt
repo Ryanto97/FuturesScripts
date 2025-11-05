@@ -183,7 +183,6 @@ BlacklightCase.Fields =
         DamgeCauseBy: "fhg_damagecausedby",
         TypeOfDamage: "fhg_typeofdamage",
         UpdateBySms: "fhg_updatebysms",
-        Sustainability: "fhg_sustainabilitytype"
 
     },
     ReportingData: {

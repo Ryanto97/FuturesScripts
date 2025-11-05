@@ -30,3 +30,12 @@ Futures.ShowHideFieldBasedOnValues = function (fieldname,allowedValues) {
         }
  
     }
+Futures.ShowHideFieldBasedOnValuesWithLookup = function (fieldname, LookupValueName) {
+        var referredByValue = Blacklight.GetValueLookupName(fieldname);
+        if (referredByValue && LookupValueName.includes[referredByValue]){
+            // If the value is in the allowed values, set the field to visible
+            Blacklight.SetVisible(fieldname, true);
+        } else {
+            Blacklight.SetVisible(fieldname, false);
+        }
+}
