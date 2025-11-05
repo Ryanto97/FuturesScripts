@@ -3,6 +3,8 @@ if (typeof (Futures) === "undefined") {
     Futures = function () { };
 }
 
+
+
 //Define the fileds and the options to be shown in the fields for any subject
 Futures.FieldsAndOptionSetToShow = {
     ASB:[

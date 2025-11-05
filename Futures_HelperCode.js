@@ -3,6 +3,8 @@ if (typeof (Futures) === "undefined") {
 }
 
 
+
+
 Futures.setFieldNull = function(formContext, fieldName){
     var itemAttr = formContext.getAttribute(fieldName);
     itemAttr.setValue(null);

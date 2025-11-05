@@ -1,6 +1,8 @@
 if (typeof (Blacklight) === "undefined") {
     Blacklight = function () { };
 }
+
+
 // Independent Living
 Blacklight.IndependentLiving = function ()
 {

@@ -2,6 +2,8 @@ if (typeof (Futures) === "undefined") {
     Futures = function () { };
 }
 
+
+
 // Case 1: New Form => on load subject is null
 // Case 2: Saved Form
 // Case 3: On remove of subject 

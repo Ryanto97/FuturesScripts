@@ -2,6 +2,8 @@ if (typeof (Futures) === "undefined") {
     Futures = function () { };
 }
 
+
+
 Futures.OnLoad(executionContext)
 {
     var formContext = executionContext.getFormContext();
