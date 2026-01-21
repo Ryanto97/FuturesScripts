@@ -1,40 +1,33 @@
-function getCategoryName(executionContext) {
-    // Get the form context from the execution context
-    var formContext = executionContext.getFormContext();  
-    // Get the value of the lookup field "fhg_category"
-    var Lookup = formContext.getAttribute("fhg_category").getValue();
-    
-    // check lookup Value to get the name of the selected category
-    if (Lookup) {
-        var CategoryName = Lookup[0].name;
-        console.log(CategoryName); // Repairs
-    } 
+function handleCategoryAndSubcategory(executionContext) {
+    var formContext = executionContext.getFormContext();
 
-// Show or hide the job number field based on the selected category
-switch(CategoryName) {
-    case "Repairs":
-        formContext.getControl("fhg_jobnumber").setVisible(true);
-        break;
-    case "Assets Compliance and Health & Safety":
-        formContext.getControl("fhg_jobnumber").setVisible(true);
-        break;
-    case "Development Aftersales":
-        formContext.getControl("fhg_jobnumber").setVisible(true);
-        break;
-    case "Adaptions":
-        formContext.getControl("fhg_jobnumber").setVisible(true);
-        break;
-    case "Assets":
-        formContext.getControl("fhg_jobnumber").setVisible(true);
-        break;
-    case "Decants":
-        formContext.getControl("fhg_jobnumber").setVisible(true);
-        break;
-    default:
-        formContext.getControl("fhg_jobnumber").setVisible(false);
-        break;
+    // Get category and subcategory values
+    var categoryLookup = formContext.getAttribute("fhg_category")?.getValue();
+    var subCategoryLookup = formContext.getAttribute("fhg_subcategory")?.getValue();
 
+    var categoryName = categoryLookup ? categoryLookup[0].name : null;
+    var subCategoryName = subCategoryLookup ? subCategoryLookup[0].name : null;
+
+    console.log("Category:", categoryName);
+    console.log("Subcategory:", subCategoryName);
+
+    // Arrays for visibility logic
+    var visibleCategories = [
+        "Repairs",
+        "Assets Compliance and Health & Safety",
+        "Development Aftersales",
+        "Adaptions",
+        "Assets",
+        "Decants"
+    ];
+
+    var visibleSubCategories = [
+        "Repairs",
+        "Assets"
+    ];
+
+    // Determine visibility
+    var showJobNumber = visibleCategories.includes(categoryName) || visibleSubCategories.includes(subCategoryName);
+
+    formContext.getControl("fhg_jobnumber").setVisible(showJobNumber);
 }
-}
-
-
