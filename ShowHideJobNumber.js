@@ -27,6 +27,9 @@ switch(CategoryName) {
     case "Assets":
         formContext.getControl("fhg_jobnumber").setVisible(true);
         break;
+    case "Decants":
+        formContext.getControl("fhg_jobnumber").setVisible(true);
+        break;
     default:
         formContext.getControl("fhg_jobnumber").setVisible(false);
         break;
