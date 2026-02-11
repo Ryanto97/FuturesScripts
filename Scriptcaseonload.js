@@ -1,249 +1,454 @@
- // JavaScript source code
-if (typeof (Futures) === "undefined") {
-    Futures = function () { };
+if (typeof (Blacklight) === "undefined") {
+    Blacklight = function () { };
 }
 
-Futures.OptionSetToHide = {
-    ASB:{
-        Primary: {
-            Field: "fhg_asbprimarycategory",
-            Options: [100000011,100000002,100000004,100000008,100000009,100000012,100000015,100000000,993780002] // 100000007 Hate Related incident removed
-        },
-        Secondary:{
-            Field: "fhg_asbsecondarycategory",
-            Options: [100000011,100000002,100000004,100000008,100000009,100000012,100000015,100000000,993780002] // 100000007 Hate Related incident removed
-        }
-    },
-    Complaints:{
-        Primary: {
-            Field: "fhg_complaintsecondarycategory",
-            Options: [100000011]
-           
-        },
-        Secondary:{
-            Field: "fhg_stage",
-            Options: [100000000]
+function OnLoad(executionContext) {
+    // Hide all fields and tabs
+    debugger;
+    var formTabs = BlacklightCase.GetTabs();
+    var fieldsToSHow = BlacklightCase.GetFields(BlacklightCase.Fields.Common);
 
-    },
-    },
-    Hse:{
-        Primary: {
-            Field: "fhg_hsecategory",
-            Options: [100000007]
-        },
-        Secondary:{ // Impactedparty 
-            Field: "fhg_impactedparty",
-            Options: [100000003,100000005]// Team Memeber & Work experience
-        }
-    },
-    EstateManagement:{
-        Primary: {
-            Field: "fhg_estatemanagementprimarycategory",
-            Options: [100000017] // Property/Garden
-        },
-        Secondary:{
-            Field: "fhg_estatemanagementlocation",
-            Options: [100000000] // Property
-        }
-    }
-};
+    var formContext = executionContext.getFormContext();
+    Blacklight.SetFormContext(formContext);
+   
+    formTabs.forEach(function (tabId)
+    {
+        var listOfFields = Blacklight.GetAllFields(tabId);
+        if (listOfFields) {
+            listOfFields.forEach(function (field) {
+                Blacklight.SetVisible(field, false);
+                Blacklight.SetMandatory(field, false);
+            });
 
-function FuturesOnload(executionContext){
-        "use strict"; debugger;
-        
-        var formContext = executionContext.getFormContext();
-        Blacklight.SetFormContext(formContext);
-  
-        lockedCase(formContext);
-      
-        filterOptionsWithSwitch();
-        formContext.getAttribute("subjectid").addOnChange(filterOptionsWithSwitch);
-
-        //showhideFurtherReferralDetails();
-        formContext.getAttribute("fhg_referredby").addOnChange(showhideFurtherReferralDetails);
-
-        //showhideotherReferralDetails();
-        formContext.getAttribute("fhg_referredby").addOnChange(showhideotherReferralDetails);
-
-        //disable hyperlinks for restricted roles
-        disableHyperlinksForRestrictedRoles();
-
-        for (var category in Futures.OptionSetToHide) {
-            var categoryItem = Futures.OptionSetToHide[category];
-            for (var subCategory in categoryItem) {
-                var subCategoryItem = categoryItem[subCategory];
-                var field = subCategoryItem.Field;
-                var options = subCategoryItem.Options;
-                var control = formContext.getControl(field);
-
-                if (control !== null) {
-                    options.forEach(function(option) {
-                        control.removeOption(option);
-                    });
-                }
+            if (tabId !== BlacklightCase.Tabs.general) {
+                Blacklight.ShowHideTab(tabId, false);
             }
         }
-
-
-        // disable Subject if not new record
-        formContext.getControl("subjectid").setDisabled(Xrm.Page.ui.getFormType() != 1);  
-        //disable incident Date and Reported on date if not a new record 
-        formContext.getControl("fhg_incidentdate").setDisabled(Xrm.Page.ui.getFormType() != 1);  
-        formContext.getControl("fhg_reportedondate").setDisabled(Xrm.Page.ui.getFormType() != 1);  
-      
-
-
- 
-    //var OptionSetSwitchLibrary = (function () {
-    function filterOptionsWithSwitch(executionContext) {
-        var subject = Blacklight.GetSubjectName(BlacklightCase.Fields.Common.Subject);
-        var itemAttr = formContext.getAttribute("fhg_referredby");
-        var itemControl = formContext.getControl("fhg_referredby");
-
-        if (!subject) {
-        itemAttr.setValue(null); // Clear the subject if not set
-        return;
+    });
+    
+    fieldsToSHow.forEach(field => {
+        Blacklight.SetVisible(field, true);
+        if (field !== BlacklightCase.Fields.Common.CaseNumber) {
+            Blacklight.SetMandatory(field, true);
         }
-        console.log("Subject is set to: " + subject);
-        // If subject is not set, do not filter options
-        var allOptions = itemAttr.getOptions();
+        
+    });
+    ClearMappedFields();
+   // Phase2();
+    RemoveOldComplaints();
+    setFieldsOnUpdate();
+    checkSubject();
+    
+    Blacklight.CaseResolution.Init();
+    showPropertyAndTenancy();
+    formContext.getAttribute(BlacklightCase.Fields.Common.Customer).addOnChange(OnCustomerChanged);
+    formContext.getAttribute(BlacklightCase.Fields.CustomerRisk.SecondaryCategories).addOnChange(customerRiskSecondaryCategoriesOnChange);
+    //Blacklight.SharePoint();
+    Warning(Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Customer))
 
-        // Define allowed values based on category using switch
-        var allowedValues = [100000000,100000001,100000002,100000003,100000004,100000005,100000006,100000007,100000008,100000009,100000010,100000011,100000012,100000013,100000014,100000015,100000016,100000017];
-        // Use switch statement to determine allowed values based on subject
-        // Note: Replace the empty arrays with actual allowed values for each subject
-        switch (subject) {
-            case "Independent Living" : //Independent Living
-                console.log("Independent Living subject selected");
-                allowedValues = [100000000,100000001,100000002,100000003,100000004,100000005];
-                break;
-            case "Beep Assist" : // Beep Assist
-                console.log("Beep Assist subject selected");
-                allowedValues = [100000000,100000003,100000006,100000007,100000008,100000009,100000010,100000011,100000012,100000013,100000014,100000015,100000016,100000017]; 
-                break;
-            default:
-                allowedValues = [];
+
+    var customerID = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Customer)
+    if (customerID) {
+        if (Blacklight.IsNewForm()) {
+            Blacklight.Common.GetTenancyPropertyOccupancy(customerID, OccupancySearchCompleted);
         }
+    }
 
-        // Clear and re-add only allowed options
-        itemControl.clearOptions();
-        allOptions.forEach(function (option) {
-            if (allowedValues.includes(option.value)) {
-                itemControl.addOption(option);
+    var hasProperty = Blacklight.CheckValueNotEmpty(BlacklightCase.Fields.Tenancy.fhg_property);
+    var hasTenancy = Blacklight.CheckValueNotEmpty(BlacklightCase.Fields.Tenancy.fhg_tenancy);
+
+    var subject = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Subject);
+    if (!subject || 
+        subject.replace(/[{}]/g, "").toLowerCase() !== BlacklightCase.subjects.SharedOwnership) {
+        Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_property, hasProperty);
+        Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_tenancy, hasTenancy);
+    }
+
+    function RemoveOldComplaints() {
+        var subjectControl = Xrm.Page.getControl("subjectid");
+        if (subjectControl) {
+            subjectControl.addPreSearch(function () {
+                subjectControl.addCustomFilter(
+                    "<filter type='and'>" +
+                    "<condition attribute='subjectid' operator='ne' value='" + BlacklightCase.subjects.Complaint + "' />" +
+                    "<condition attribute='isleaf' operator='eq' value='1' />" +
+                    "</filter>",
+                    "subject"
+                );
+            });
+        }
+    }
+     function hideAllFields() {
+        
+        var subjectHeadings = BlacklightCase.GetFields(BlacklightCase.Fields);
+        subjectHeadings.forEach(field => {
+            Blacklight.SetVisible(field, false);
+
+        });
+        fieldsToSHow.forEach(field => {
+            Blacklight.SetVisible(field, true);
+            if (field !== BlacklightCase.Fields.Common.CaseNumber) {
+                Blacklight.SetMandatory(field, true);
+            }
+
+        });
+    }
+
+    function ClearMappedFields() {
+
+        var formType = Blacklight.GetFormType();
+        if (formType != 1) return;
+
+        var autoFieldsToRemove = BlacklightCase.GetFields(BlacklightCase.Fields.Mapped);
+
+        autoFieldsToRemove.forEach(field => {
+            var value = Blacklight.GetValueLookupID(field);
+            if (value) {
+                Blacklight.ClearFieldValue(field);
             }
         });
-        
     }
 
-    return {    
-        filterOptionsWithSwitch: filterOptionsWithSwitch
-    };
-
-    function showhideFurtherReferralDetails(executionContext) {
-
-        // Show or hide the "Further Referral Details" field based on the selected "Referred By" option
-        var referredBy = formContext.getAttribute("fhg_referredby").getValue();
-        var subject = Blacklight.GetSubjectName(BlacklightCase.Fields.Common.Subject);
-        // check if referred by is one of the specified values
-         if (subject == "Beep Assist" && (referredBy == 100000009 || referredBy == 100000010 || referredBy == 100000012 || referredBy == 100000014 || referredBy == 100000015 || referredBy == 100000005)) {
-        formContext.getControl("fhg_furtherreferralsdetails").setVisible(true);
-        } else {
-        formContext.getControl("fhg_furtherreferralsdetails").setVisible(false);
-        }
-   
-    }
+    function Warning(id) {
     
-    function showhideotherReferralDetails(executionContext) {
-        // Show or hide the "Other Referral Details" field based on the selected "Referred By" option
-        var referredBy = formContext.getAttribute("fhg_referredby").getValue();
-        if (referredBy == 100000005) { // Other Referral
-            formContext.getControl("fhg_otherreferralreason").setVisible(true);
-        } else {
-            formContext.getControl("fhg_otherreferralreason").setVisible(false);
+        if (id) {
+            Blacklight.CheckMarkers(id);
         }
     }
-    
 
-};
+           
+    function OnCustomerChanged() {
+        debugger;
+        var subject = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Subject);
+        if (subject) {
+            if (subject !== BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Survivorship) {
+              var customerID = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Customer);
+                if (customerID) {
+                    Blacklight.MarkerReset();
+                    Warning(customerID);
+                    var subject = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Subject);
+                    if (subject) {
+                        if (subject.replace(/[{}]/g, "").toLowerCase() === BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DirectLet) {
+                            return;
+                        }
+                    }
+                    Blacklight.Common.GetTenancyPropertyOccupancy(customerID, OccupancySearchCompleted);
+                    Blacklight.CheckContactEmail(customerID);
+                }
+                
+            }
+            
+            getCustomerAddress();
+        }
+    }
 
-function lockedCase(formContext) {
-    
-    var formType = formContext.ui.getFormType(); 
-    var userId = Xrm.Utility.getGlobalContext().userSettings.userId.toLowerCase();
+    function OccupancySearchCompleted(results)
+    {
+        var subject = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Subject);
 
-    var allowedUsers = [
-        "{8df3fece-ea2a-ee11-9965-002248c7284e}", // Leanne
-        "{52d6d963-fe1e-ee11-9967-002248c72853}", // Manjit
-        "{efda6c93-6b57-ec11-8f8f-000d3a0cefa1}"  // Stephanie
-        //"{3887a00f-cb98-ee11-be37-6045bd0c1749}" //Shubham
-    ];
+        if (subject) {
+            if (subject.replace(/[{}]/g, "").toLowerCase() === BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DirectLet) {
+                return;
+            }
+        }
+        if (results)
+        {
+            if (results.HasOccupancy)
+                Blacklight.SetLookupValue(BlacklightCase.Fields.Tenancy.fhg_occupancy, results.OccupancyID, results.OccupancyName, BlacklightCase.TableNames.fhg_occupancy);
+            else
+                Blacklight.ClearFieldValue(BlacklightCase.Fields.Tenancy.fhg_occupancy);
 
-    var lockedCaseId = "CAS-85482-W5V3B5"; //"CAS-160018-Y3F3D1";
-    var caseId = formContext.getAttribute("ticketnumber")?.getValue();
+            if (results.HasTenancy)
+                Blacklight.SetLookupValue(BlacklightCase.Fields.Tenancy.fhg_tenancy, results.TenancyID, results.TenancyName, BlacklightCase.TableNames.fhg_tenancy);
+            else
+                Blacklight.ClearFieldValue(BlacklightCase.Fields.Tenancy.fhg_tenancy);
 
-    var pageInput = {
-        pageType: "entitylist",
-        entityName: "incident"
-    };
+            if (results.HasProperty)
+                Blacklight.SetLookupValue(BlacklightCase.Fields.Tenancy.fhg_property, results.PropertyID, results.PropertyName, BlacklightCase.TableNames.fhg_property);
+            else
+                Blacklight.ClearFieldValue(BlacklightCase.Fields.Tenancy.fhg_property);
 
-   
-    if (caseId === lockedCaseId && formType !== 1) {
-        if (!allowedUsers.includes(userId)) {
-            var alertStrings = { text: "You are not authorized to view this case." };
-            var alertOptions = { height: 120, width: 260 };
 
-            Xrm.Navigation.openAlertDialog(alertStrings, alertOptions).then(
-                function () {
-                    Xrm.Navigation.navigateTo(pageInput);
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_tenancy, results.HasTenancy);
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_property, results.HasProperty);
+        }
+    }
+
+    function showPropertyAndTenancy() {
+        var subject = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Subject);
+
+        if (subject) {
+            if (subject.replace(/[{}]/g, "").toLowerCase() === BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DirectLet ||
+                subject.replace(/[{}]/g, "").toLowerCase() === BlacklightCase.subjects.SharedOwnership) {
+                return;
+            }
+        }
+        var tenancy = Blacklight.HasValue(BlacklightCase.Fields.Tenancy.fhg_tenancy);
+        if (tenancy) {
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_tenancy, true);
+        } else {
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_tenancy, false);
+        }
+        var property = Blacklight.HasValue(BlacklightCase.Fields.Tenancy.fhg_property);
+        if (property) {
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_property, true);
+        } else {
+            Blacklight.SetVisible(BlacklightCase.Fields.Tenancy.fhg_property, false);
+        }
+       
+    }
+
+    function setFieldsOnUpdate()
+    {
+        formContext.getAttribute(BlacklightCase.Fields.Common.Subject).addOnChange(checkSubject);
+        formContext.getAttribute(BlacklightCase.Fields.Resolution.ResolveCase).addOnChange(Blacklight.CaseResolution.Init);
+    }
+       
+
+    function customerRiskSecondaryCategoriesOnChange() {
+        var secondaryCategoriesAsString = Blacklight.GetMultiOptionSetText(BlacklightCase.Fields.CustomerRisk.SecondaryCategories);
+        Blacklight.SetValue(BlacklightCase.Fields.CustomerRisk.SecondaryCategoriesAsString, secondaryCategoriesAsString);
+    }
+
+    function getCustomerAddress() {
+        //fhg_customeraddress
+        //address1_composite
+        var customerID = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Customer);
+        if (customerID) {
+            var id = customerID.replace(/[{}]/g, "");
+          Xrm.WebApi.online.retrieveRecord("contact", id, "?$select=address1_composite").then(
+                function success(result) {
+                    var address1_composite = result["address1_composite"];
+                    if (address1_composite) {
+                        debugger;
+                        var currentAddress = Blacklight.GetValue("fhg_customeraddress");
+                        if (!currentAddress || currentAddress !== address1_composite) {
+                            Blacklight.SetValue("fhg_customeraddress", address1_composite);
+                        }
+                    }
                 },
                 function (error) {
-                    console.error("Alert dialog failed: ", error);
+                    Xrm.Utility.alertDialog(error.message);
                 }
             );
-
-            return; 
         }
     }
+
+    function Phase2() {
+        var phase2 = Blacklight.UserHasRoleAssigned("e4cc1566-4105-ef11-9f8a-6045bdd07cab");
+       
+        var phase2Items = [
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Abandoned,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.NoAccess,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Assignment,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.BoundaryIssue,
+            BlacklightCase.subjects.CustomerNameChange,
+            BlacklightCase.subjects.CustomerRisk,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DeathIntestate,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DirectLet,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DomesticAbuse,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Hoarding,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.JointToSole,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.ManagementTransfer,
+            BlacklightCase.subjects.Neighbourhoods.MX,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.MultiAgencySupport,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Other,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Overcrowding,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PermissionRequestTenancy,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PropertyGarden,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PropertyFireFlood,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PetsAnimals,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Safeguarding,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.SubLet,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Succession,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Survivorship,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.UseAndOccupation,
+            BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Vehicles,
+            BlacklightCase.subjects.SupportedHousing
+        ];
+        if (!phase2) {
+
+
+
+            var control = Xrm.Page.getControl("subjectid");
+            if (control) {
+                var fetchXml = "<fetch version='1.0' output-format='xml-platform' mapping='logical'>" +
+                    "<entity name='subject'>" +
+                    "<attribute name='subjectid' />" +
+                    "<attribute name='title' />" +
+                    "<filter type='and'>";
+                fetchXml += filterArray(phase2Items);
+                fetchXml += "</condition>" +
+                    "</filter>" +
+                    "</entity>" +
+                    "</fetch>";
+
+                control.addCustomView(
+                    "{00000000-0000-0000-0000-000000000001}", // A GUID for the custom view
+                    "subject", // Entity Name
+                    "Filtered Subjects", // View display name
+                    fetchXml, // FetchXML
+                    "", // Layout XML (define columns to display)
+                    true  // Set as default view
+                );
+            }
+        }
     
-};
+    }
 
-    //disable hyperlinks for restricted roles for subcategory field
-function disableHyperlinksForRestrictedRoles(formContext) {
-    var restrictedRoles = ["FHG - Basic User"];
-    var targetFieldName = "fhg_subcategory";
-
-    var userRolesCollection = Xrm.Utility.getGlobalContext().userSettings.roles;
-    var userRoles = [];
-
-    userRolesCollection.forEach(function (role) {
-        userRoles.push(role.name);
-    });
-
-    var isRestricted = userRoles.some(function (roleName) {
-        return restrictedRoles.includes(roleName);
-    });
-
-    if (isRestricted) {
-        setTimeout(function () {
-            var fieldControl = formContext.getControl(targetFieldName);
-            if (fieldControl) {
-                // This targets the actual hyperlink inside the lookup control
-                var linkElement = fieldControl.getControlType() === "lookup" 
-                    ? fieldControl._control?.getElement()?.querySelector("a") 
-                    : null;
-
-                if (linkElement) {
-                    linkElement.removeAttribute("href");
-                    linkElement.style.pointerEvents = "none";
-                    linkElement.style.color = "black";
-                    linkElement.style.textDecoration = "none";
+    function filterArray(array) {
+        var filterToReturn = "<condition attribute='title' operator='not-in'>";
+        
+        for (let i = 0; i < array.length; i++) {
+            filterToReturn += "<value>" + array[i] + "</value>";
+        }
+        filterToReturn += "</condition>";
+        return filterToReturn;
+    }
+    function checkSubject()
+    {
+        debugger;
+        var subject = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Subject);
+       
+        hideAllFields();
+        if (subject) {
+            subject = subject.replace(/[{}]/g, "").toLowerCase();
+          
+            debugger;
+            if (Blacklight.GetFormType() === Blacklight.FormTypes.Create) {
+                var customerID = Blacklight.GetValueLookupID(BlacklightCase.Fields.Common.Customer);
+                if (customerID) {
+                    Blacklight.CheckContactEmail(customerID);
                 }
             }
-        }, 3000);
-    }
-};
 
-
-
-
- 
+            switch (subject) {
+                case BlacklightCase.subjects.General:
+                    Blacklight.GeneralCaseCreator.Init();
+                    break;
+                case BlacklightCase.subjects.HomeSurvey:
+                    Blacklight.HomeSurveyCase.Init();
+                    break;
+                case BlacklightCase.subjects.Complaint:
+                    Blacklight.Complaint.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.EstateInspection:
+                    Blacklight.EstateInspection.Init();
+                    break;
+                case BlacklightCase.subjects.PermissionRequest:
+                    //formContext.getAttribute(BlacklightCase.Fields.Common.Customer).removeOnChange(OnCustomerChanged);
+                    Blacklight.PermissionRequests.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.EstateManagement:
+                    Blacklight.EstateManagment.Init();
+                    break;
+                case BlacklightCase.subjects.HSE:
+                    Blacklight.HSE.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.ASB:
+                    Blacklight.ASB.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.MX:
+                    Blacklight.MX.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.NoAccess:
+                    Blacklight.NoAccessCase.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Other:
+                    Blacklight.OtherCase.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Abandoned:
+                    Blacklight.Abandoned.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Vehicles:
+                    Blacklight.VehiclesCase.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DeathIntestate:
+                    Blacklight.DeathIntestateCase.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Survivorship:
+                    formContext.getAttribute(BlacklightCase.Fields.Common.Customer).removeOnChange(OnCustomerChanged);
+                    Blacklight.Survivorship.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PermissionRequestTenancy:
+                    Blacklight.PermissionRequestTenancy.Init();
+                    break;
+                case BlacklightCase.subjects.CustomerNameChange:
+                    //Blacklight.CustomerNameChange.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.BoundaryIssue:
+                    Blacklight.BoundaryIssue.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PetsAnimals:
+                    Blacklight.PetsAnimals.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.SubLet:
+                    Blacklight.SubLet.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Succession:
+                    formContext.getAttribute(BlacklightCase.Fields.Common.Customer).removeOnChange(OnCustomerChanged);
+                    Blacklight.Succession.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.JointToSole:
+                    formContext.getAttribute(BlacklightCase.Fields.Common.Customer).removeOnChange(OnCustomerChanged);
+                    Blacklight.JointToSole.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Assignment:
+                    formContext.getAttribute(BlacklightCase.Fields.Common.Customer).removeOnChange(OnCustomerChanged);
+                    Blacklight.Assignment.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Overcrowding:
+                    Blacklight.Overcrowding.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.UseAndOccupation:
+                    Blacklight.UseAndOccupation.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DirectLet:
+                    Blacklight.DirectLet.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.MultiAgencySupport:
+                    Blacklight.MultiAgencySupport.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Hoarding:
+                    Blacklight.Hoarding.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.Safeguarding:
+                    Blacklight.Safeguarding.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.ManagementTransfer:
+                    Blacklight.ManagementTransfer.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PropertyGarden:
+                    Blacklight.PropertyGarden.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.PropertyFireFlood:
+                    Blacklight.PropertyFireFlood.Init();
+                    break;
+                case BlacklightCase.subjects.Neighbourhoods.TenancyManagement.DomesticAbuse:
+                    Blacklight.DomesticAbuse.Init();
+                    break;
+                case BlacklightCase.subjects.CustomerRisk:
+                    formContext.getAttribute(BlacklightCase.Fields.Common.Customer).removeOnChange(OnCustomerChanged);
+                    Blacklight.CustomerRisk.Init();
+                    break;
+                case BlacklightCase.subjects.SupportedHousing:
+                    Blacklight.SupportedHousing.Init();
+                    break;
+                case BlacklightCase.subjects.ComplaintNew:
+                    Blacklight.ComplaintNew.Init();
+                    break;
+                case BlacklightCase.subjects.SharedOwnership:
+                    Blacklight.SharedOwnership.Init();
+                    break;
+               case BlacklightCase.subjects.BeepAssist:
+                    Blacklight.BeepAssist.Init();
+                    break;
+                case BlacklightCase.subjects.IndependentLiving:
+                    Blacklight.IndependentLiving.Init();
+                    break;
+                default:
+                    break;
+            }
+        }
+    } 
+}

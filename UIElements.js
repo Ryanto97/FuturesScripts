@@ -123,7 +123,7 @@ BlacklightCase.Fields =
         AssignToTeam: "fhg_assigntoteam",
         RepairsTrade: "fhg_repairstrade",
         OnBehalfOf: "fhg_onbehalfofcustomer",
-        Area:"fhg_area"
+        //Area:"fhg_area"
     },
     HomeSurvey:
     {
@@ -183,7 +183,6 @@ BlacklightCase.Fields =
         DamgeCauseBy: "fhg_damagecausedby",
         TypeOfDamage: "fhg_typeofdamage",
         UpdateBySms: "fhg_updatebysms",
-        Sustainability: "fhg_sustainabilitytype"
 
     },
     ReportingData: {
@@ -251,7 +250,6 @@ BlacklightCase.Fields =
         fhg_alteration: "fhg_alteration",
         fhg_alterationgroup: "fhg_alterationgroup",
         fhg_onbehalfofcustomer: "fhg_onbehalfofcustomer",
-        
     },
     Tenancy:
     {
@@ -337,9 +335,7 @@ BlacklightCase.Fields =
         Area: "fhg_area"
     },
     Other: {
-        Area: "fhg_area",
-        CategoryOther: "fhg_categoryother"
-
+        Area: "fhg_area"
     },
     Abandoned: {
         AbandonedCategory: "fhg_abandonedcategory",
@@ -368,8 +364,7 @@ BlacklightCase.Fields =
         Area: "fhg_area"
     },
     PermissionRequestTenancy: {
-        PermissionRequestTenancyCategory: "fhg_permissionrequesttenancycategory",
-        Area: "fhg_area"
+        PermissionRequestTenancyCategory: "fhg_permissionrequesttenancycategory"
     },
     CustomerNameChange: {
 
@@ -572,8 +567,6 @@ BlacklightCase.NoAccessClosureReason = {
 
 BlacklightCase.subjects = {
     General: "4b2bcd0b-2f16-ec11-b6e6-002248412841",
-    BeepAssist: "00d2c118-b25c-f011-bec1-7c1e520321a4",
-    IndependentLiving: "25400b1f-b25c-f011-bec1-7c1e520321a4",
     HomeSurvey: "24689177-2f16-ec11-b6e6-002248412841",
     Complaint: "d3711032-2f16-ec11-b6e6-002248412841",
     ComplaintNew: "1dc5dc33-50a3-ef11-8a69-7c1e5202b170",
@@ -612,7 +605,8 @@ BlacklightCase.subjects = {
     HSE: "aa788644-2f16-ec11-b6e6-002248412841",
     CustomerNameChange: "156eb746-ddb0-ec11-983f-0022484349f5",
     CustomerRisk: "51d54f38-f8df-ec11-bb3d-002248412d5b",
-    SupportedHousing: "2f7b17bd-16eb-ec11-bb3c-002248400ff9"
+    SupportedHousing: "2f7b17bd-16eb-ec11-bb3c-002248400ff9",
+    SharedOwnership: "775916c0-61ba-f011-bbd2-7ced8d6c19f6"
 };
 
 
@@ -650,3 +644,6 @@ BlacklightCase.SubjectsWithAutoEmail = [
     BlacklightCase.subjects.Neighbourhoods.MX,
     BlacklightCase.subjects.HSE
 ];
+
+
+
